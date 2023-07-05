@@ -1,52 +1,73 @@
 package com.github.sirblobman.plugin.cooldown.task;
 
-import org.jetbrains.annotations.NotNull;
+import java.util.Locale;
+import java.util.logging.Logger;
 
-import org.bukkit.entity.Player;
-
-import com.github.sirblobman.api.folia.FoliaHelper;
-import com.github.sirblobman.api.folia.details.TaskDetails;
-import com.github.sirblobman.api.folia.scheduler.TaskScheduler;
-import com.github.sirblobman.api.language.LanguageManager;
-import com.github.sirblobman.plugin.cooldown.api.CooldownsX;
 import com.github.sirblobman.plugin.cooldown.api.data.PlayerCooldown;
 import com.github.sirblobman.plugin.cooldown.api.data.PlayerCooldownManager;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
-public abstract class CooldownTask extends TaskDetails {
-    private final CooldownsX plugin;
+import com.github.sirblobman.api.configuration.ConfigurationManager;
+import com.github.sirblobman.api.language.LanguageManager;
+import com.github.sirblobman.api.utility.Validate;
+import com.github.sirblobman.plugin.cooldown.CooldownPlugin;
+import com.github.sirblobman.plugin.cooldown.manager.CooldownManager;
 
-    public CooldownTask(@NotNull CooldownsX plugin) {
-        super(plugin.getPlugin());
-        this.plugin = plugin;
+import org.jetbrains.annotations.NotNull;
+
+public abstract class CooldownTask extends BukkitRunnable {
+    private final CooldownPlugin plugin;
+
+    public CooldownTask(CooldownPlugin plugin) {
+        this.plugin = Validate.notNull(plugin, "plugin must not be null!");
     }
 
-    protected final @NotNull CooldownsX getCooldownsX() {
+    protected final CooldownPlugin getPlugin() {
         return this.plugin;
     }
 
-    protected final @NotNull LanguageManager getLanguageManager() {
-        CooldownsX plugin = getCooldownsX();
+    protected final LanguageManager getLanguageManager() {
+        CooldownPlugin plugin = getPlugin();
         return plugin.getLanguageManager();
     }
 
-    protected final @NotNull PlayerCooldownManager getCooldownManager() {
-        CooldownsX plugin = getCooldownsX();
+    protected final PlayerCooldownManager getCooldownManager() {
+        CooldownPlugin plugin = getPlugin();
         return plugin.getCooldownManager();
     }
 
-    protected final @NotNull PlayerCooldown getCooldownData(Player player) {
+    @NotNull
+    protected final PlayerCooldown getCooldownData(Player player) {
         PlayerCooldownManager cooldownManager = getCooldownManager();
         return cooldownManager.getData(player);
     }
 
-    public void startAsync() {
-        setDelay(1L);
-        setPeriod(1L);
+    private boolean isDebugModeDisabled() {
+        CooldownPlugin plugin = getPlugin();
+        ConfigurationManager configurationManager = plugin.getConfigurationManager();
+        YamlConfiguration configuration = configurationManager.get("config.yml");
+        return !configuration.getBoolean("debug-mode", false);
+    }
 
-        CooldownsX cooldownsX = getCooldownsX();
-        FoliaHelper foliaHelper = cooldownsX.getFoliaHelper();
-        TaskScheduler scheduler = foliaHelper.getScheduler();
-        scheduler.scheduleAsyncTask(this);
+    protected final void printDebug(String message) {
+        if (isDebugModeDisabled()) {
+            return;
+        }
+
+        Class<? extends CooldownTask> thisClass = getClass();
+        String className = thisClass.getSimpleName();
+
+        CooldownPlugin plugin = getPlugin();
+        Logger logger = plugin.getLogger();
+        String logMessage = String.format(Locale.US, "[Debug] [%s] %s", className, message);
+        logger.info(logMessage);
+    }
+
+    public void startAsync() {
+        CooldownPlugin plugin = getPlugin();
+        runTaskTimerAsynchronously(plugin, 1L, 1L);
     }
 
     @Override

@@ -43,42 +43,6 @@ public final class ListenerPotionModern extends CooldownListener {
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onPotionConsume(PlayerItemConsumeEvent e) {
-        printDebug("Detected PlayerItemConsumeEvent...");
-
-        ItemStack item = e.getItem();
-        if (isNotPotion(item)) {
-            printDebug("Consumed item was not a potion, ignoring event.");
-            return;
-        }
-
-        List<XPotion> potionList = getPotionEffects(item);
-        if(potionList.isEmpty()) {
-            printDebug("Consumed potion does not have any effects, ignoring event.");
-            return;
-        }
-
-        Player player = e.getPlayer();
-        printDebug("Player: " + player.getName());
-
-        PlayerCooldown cooldownData = getCooldownData(player);
-        Set<Cooldown> allActiveCooldowns = cooldownData.getActiveCooldowns(CooldownType.POTION);
-        Set<Cooldown> activeCooldowns = filter(allActiveCooldowns, potionList);
-        Cooldown activeCooldown = checkActiveCooldowns(player, activeCooldowns);
-
-        if (activeCooldown != null) {
-            printDebug("Found active cooldown '" + activeCooldown.getId() + "for potion s" + potionList + ".");
-            e.setCancelled(true);
-            sendCooldownMessage(player, activeCooldown, potionList.get(0));
-            printDebug("Cancelled event and sent message to player.");
-            updateInventoryLater(player);
-            printDebug("Triggered player inventory update for one tick later.");
-        } else {
-            printDebug("No active cooldowns for potion " + potionList + ".");
-        }
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEntityPotionEffect(EntityPotionEffectEvent e) {
         printDebug("Detected EntityPotionEffectEvent...");
 
@@ -100,6 +64,10 @@ public final class ListenerPotionModern extends CooldownListener {
             printDebug("New effect is null, ignoring.");
             return;
         }
+
+        if(e.getCause() != EntityPotionEffectEvent.Cause.POTION_DRINK) return;
+
+        if(e.getNewEffect().getAmplifier() < 2) return;
 
         Set<Cooldown> cooldownSettingsList = fetchCooldowns(CooldownType.POTION);
         if (cooldownSettingsList.isEmpty()) {
@@ -132,7 +100,47 @@ public final class ListenerPotionModern extends CooldownListener {
         checkValidCooldowns(player, validCooldowns);
     }
 
-    private boolean isNotPotion(@NotNull ItemStack item) {
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onPotionConsume(PlayerItemConsumeEvent e) {
+        printDebug("Detected PlayerItemConsumeEvent...");
+
+
+        ItemStack item = e.getItem();
+        if (isNotPotion(item)) {
+            printDebug("Consumed item was not a potion, ignoring event.");
+            return;
+        }
+
+        List<XPotion> potionList = getPotionEffects(item);
+        if(potionList.isEmpty()) {
+            printDebug("Consumed potion does not have any effects, ignoring event.");
+            return;
+        }
+
+        Player player = e.getPlayer();
+        printDebug("Player: " + player.getName());
+
+        PlayerCooldown cooldownData = getCooldownData(player);
+        Set<Cooldown> allActiveCooldowns = cooldownData.getActiveCooldowns(CooldownType.POTION);
+        Set<Cooldown> activeCooldowns = filter(allActiveCooldowns, potionList);
+        Cooldown activeCooldown = checkActiveCooldowns(player, activeCooldowns);
+
+        printDebug("Detected PlayerItemConsumeEvent...");
+
+
+        if (activeCooldown != null) {
+            printDebug("Found active cooldown '" + activeCooldown.getId() + "for potion s" + potionList + ".");
+            e.setCancelled(true);
+            sendCooldownMessage(player, activeCooldown, potionList.get(0));
+            printDebug("Cancelled event and sent message to player.");
+            updateInventoryLater(player);
+            printDebug("Triggered player inventory update for one tick later.");
+        } else {
+            printDebug("No active cooldowns for potion " + potionList + ".");
+        }
+    }
+
+    private boolean isNotPotion(ItemStack item) {
         if (ItemUtility.isAir(item)) {
             return true;
         }

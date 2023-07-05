@@ -40,7 +40,7 @@ public final class ModernHelper {
         return !crossbowMeta.hasChargedProjectiles();
     }
 
-    public static @NotNull List<XPotion> getPotionEffects(@Nullable ItemStack item) {
+    public static List<XPotion> getPotionEffects(ItemStack item) {
         if (ItemUtility.isAir(item)) {
             return Collections.emptyList();
         }
@@ -56,9 +56,13 @@ public final class ModernHelper {
         PotionData basePotionData = potionMeta.getBasePotionData();
         PotionType basePotionType = basePotionData.getType();
         PotionEffectType baseEffectType = basePotionType.getEffectType();
+        if(basePotionData.getType() == PotionType.TURTLE_MASTER || basePotionData.getType().getEffectType() == PotionEffectType.DAMAGE_RESISTANCE) {
+           baseEffectType = PotionEffectType.DAMAGE_RESISTANCE;
+        }
         if (baseEffectType != null) {
             XPotion xpotion = XPotion.matchXPotion(baseEffectType);
             potionList.add(xpotion);
+
         }
 
         List<PotionEffect> customEffectList = potionMeta.getCustomEffects();
