@@ -50,5 +50,10 @@ public enum CooldownType {
      * Only works on Spigot 1.13.2 or higher.
      * Requires an entity type.
      */
-    PLACE_ENTITY
+    PLACE_ENTITY,
+
+    /**
+     * The act of using a riptide trident (not charging it up, actually firing it)
+     */
+    RIPTIDE
 }

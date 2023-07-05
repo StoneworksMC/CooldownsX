@@ -105,6 +105,10 @@ public final class ListenerPotionModern extends CooldownListener {
             return;
         }
 
+        if(e.getCause() != EntityPotionEffectEvent.Cause.POTION_DRINK) return;
+
+        if(e.getNewEffect().getAmplifier() < 2) return;
+
         Set<Cooldown> cooldownSettingsList = fetchCooldowns(CooldownType.POTION);
         if (cooldownSettingsList.isEmpty()) {
             printDebug("No POTION cooldowns available, ignoring.");
