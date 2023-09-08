@@ -84,7 +84,7 @@ public final class ListenerInteract extends CooldownListener {
 
     private void checkBlock(@NotNull Player player, @NotNull Block block, @NotNull PlayerInteractEvent e) {
         XMaterial material = getXMaterial(block);
-        if (material == XMaterial.AIR) {
+        if (material == XMaterial.AIR || material == XMaterial.WATER_CAULDRON || material == XMaterial.CAULDRON) {
             return;
         }
 

@@ -73,6 +73,7 @@ public final class ListenerPotionModern extends CooldownListener {
             printDebug("Cancelled event and sent message to player.");
             updateInventoryLater(player);
             printDebug("Triggered player inventory update for one tick later.");
+            return;
         } else {
             printDebug("No active cooldowns for potion " + potionList + ".");
         }
@@ -82,7 +83,9 @@ public final class ListenerPotionModern extends CooldownListener {
         checkValidCooldowns(player, validCooldowns);
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+
+
+    /* @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEntityPotionEffect(EntityPotionEffectEvent e) {
         printDebug("Detected EntityPotionEffectEvent...");
 
@@ -107,7 +110,7 @@ public final class ListenerPotionModern extends CooldownListener {
 
         if(e.getCause() != EntityPotionEffectEvent.Cause.POTION_DRINK) return;
 
-        if(e.getNewEffect().getAmplifier() < 2) return;
+        if(e.getNewEffect().getAmplifier() < 2 && e.getNewEffect().getType() == PotionEffectType.DAMAGE_RESISTANCE) return;
 
         Set<Cooldown> cooldownSettingsList = fetchCooldowns(CooldownType.POTION);
         if (cooldownSettingsList.isEmpty()) {
@@ -139,6 +142,8 @@ public final class ListenerPotionModern extends CooldownListener {
         Set<Cooldown> validCooldowns = filter(allValidCooldowns, potion);
         checkValidCooldowns(player, validCooldowns);
     }
+
+*/
 
     private boolean isNotPotion(@NotNull ItemStack item) {
         if (ItemUtility.isAir(item)) {
