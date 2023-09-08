@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.github.sirblobman.plugin.cooldown.CooldownPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import org.bukkit.Bukkit;
@@ -21,7 +22,7 @@ import com.github.sirblobman.api.shaded.adventure.text.Component;
 import com.github.sirblobman.api.shaded.adventure.text.minimessage.MiniMessage;
 
 public final class ActionBarTask extends CooldownTask {
-    public ActionBarTask(@NotNull CooldownsX plugin) {
+    public ActionBarTask(@NotNull CooldownPlugin plugin) {
         super(plugin);
     }
 

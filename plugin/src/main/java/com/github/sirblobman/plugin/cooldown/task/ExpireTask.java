@@ -3,6 +3,7 @@ package com.github.sirblobman.plugin.cooldown.task;
 import java.util.Collection;
 import java.util.Set;
 
+import com.github.sirblobman.plugin.cooldown.CooldownPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import org.bukkit.Bukkit;
@@ -13,7 +14,7 @@ import com.github.sirblobman.plugin.cooldown.api.configuration.Cooldown;
 import com.github.sirblobman.plugin.cooldown.api.data.PlayerCooldown;
 
 public final class ExpireTask extends CooldownTask {
-    public ExpireTask(@NotNull CooldownsX plugin) {
+    public ExpireTask(@NotNull CooldownPlugin plugin) {
         super(plugin);
     }
 
